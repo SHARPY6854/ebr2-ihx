@@ -1,0 +1,36 @@
+{
+ "given": {
+  "N_tubes": 3026,
+  "tube_OD_m": 0.01588,
+  "tube_wall_m": 0.00124,
+  "pitch_m": 0.02064,
+  "tube_length_m": 3.137,
+  "casing_length_m": 5.639,
+  "casing_ID_m": 1.295,
+  "sec_pipe_OD_m": 0.324,
+  "sec_pipe_wall_m": 0.00635,
+  "sec_inlet_plenum_m3": 0.774,
+  "sec_outlet_plenum_m3": 0.774,
+  "tubesheet_thk_m": 0.0762,
+  "material": "304SS",
+  "primary_inlet_elev_m": 4.939,
+  "casing_bottom_elev_m": 1.559,
+  "fig_lower_tubesheet_bottom_elev_m": 2.232,
+  "fig_upper_tubesheet_elev_m": 5.369,
+  "fig_primary_outlet_elev_m_approx": "2.302~2.372"
+ },
+ "derived": {
+  "tube_ID_m": 0.013399999999999999,
+  "P_over_D": 1.2997481108312343,
+  "tube_flow_area_m2": 0.4267449611086481,
+  "HT_area_outer_m2": 473.56959712197664,
+  "HT_area_inner_m2": 399.61162477547145,
+  "casing_area_m2": 1.3171323549716054,
+  "tubes_outer_area_m2": 0.5993214219235725,
+  "center_pipe_area_m2": 0.08244795760081053,
+  "shell_flow_area_m2_assume_center_pipe": 0.6353629754472223,
+  "shell_Dh_m": 0.016286262279583536,
+  "tube_Dh_m": 0.013399999999999999,
+  "check_tube_span_from_fig_m": 3.1369999999999996
+ }
+}
