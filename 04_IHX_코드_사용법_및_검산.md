@@ -39,6 +39,8 @@ print("2차측 출구 온도 [K]:", res["T2_out_K"])
 print("열교환량 [MW]:", res["Q_W"] / 1e6)
 ```
 
+*(참고: SHRT-45R 계산 시에는 [07_SHRT45R_초기유량_판정.md](07_SHRT45R_초기유량_판정.md) 결론에 따라 `load_secondary_bc("SHRT45R", flow_scale=SHRT45R_FLOW_SCALE)`로 부르면 0초 유량이 `5474.5 gpm`(`302.82 kg/s`)에 맞게 자동 보정된다.)*
+
 ---
 
 ## 3. 입출력 변수 정리

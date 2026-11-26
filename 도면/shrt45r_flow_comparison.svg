@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" font-family="sans-serif">
+<rect width="760" height="400" fill="#ffffff"/>
+<text x="380" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#111827">SHRT-45R 2차측 초기 유량 후보 비교 (5079.5 gpm vs 5474.5 gpm)</text>
+<text x="380" y="47" text-anchor="middle" font-size="11" fill="#4b5563">사양서 초기 출력 60.0 MW 및 노심 혼합 출구 온도 444.05 °C 기준 정합성 판정</text>
+<text x="215" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#1f2937">[1] 60.0 MW 흡수에 필요한 2차 출구 온도 [°C]</text>
+<rect x="75" y="80" width="280" height="235" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+<rect x="76" y="81" width="278" height="122.1" fill="#fee2e2" opacity="0.7"/>
+<text x="215.0" y="98" text-anchor="middle" font-size="10" font-weight="bold" fill="#991b1b">불가능 구역: 1차 입구(444.05 °C)보다 뜨거움 (제2법칙 위배)</text>
+<line x1="75" y1="315.0" x2="355" y2="315.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="319.0" text-anchor="end" font-size="10" fill="#374151">425</text>
+<line x1="75" y1="285.6" x2="355" y2="285.6" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="289.6" text-anchor="end" font-size="10" fill="#374151">430</text>
+<line x1="75" y1="256.2" x2="355" y2="256.2" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="260.2" text-anchor="end" font-size="10" fill="#374151">435</text>
+<line x1="75" y1="226.9" x2="355" y2="226.9" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="230.9" text-anchor="end" font-size="10" fill="#374151">440</text>
+<line x1="75" y1="197.5" x2="355" y2="197.5" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="201.5" text-anchor="end" font-size="10" fill="#374151">445</text>
+<line x1="75" y1="168.1" x2="355" y2="168.1" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="172.1" text-anchor="end" font-size="10" fill="#374151">450</text>
+<line x1="75" y1="138.8" x2="355" y2="138.8" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="142.8" text-anchor="end" font-size="10" fill="#374151">455</text>
+<line x1="75" y1="109.4" x2="355" y2="109.4" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="113.4" text-anchor="end" font-size="10" fill="#374151">460</text>
+<line x1="75" y1="80.0" x2="355" y2="80.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="67" y="84.0" text-anchor="end" font-size="10" fill="#374151">465</text>
+<rect x="115" y="132.8" width="76" height="182.2" fill="#ef4444" rx="3"/>
+<text x="153" y="125.8" text-anchor="middle" font-size="11" font-weight="bold" fill="#b91c1c">456.01 °C</text>
+<text x="153" y="148.8" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">역전 (+12.0 K)</text>
+<rect x="235" y="204.5" width="76" height="110.5" fill="#2563eb" rx="3"/>
+<text x="273" y="222.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">443.80 °C</text>
+<text x="273" y="237.5" text-anchor="middle" font-size="10" fill="#dbeafe">성립 (-0.25 K)</text>
+<line x1="75" y1="203.1" x2="355" y2="203.1" stroke="#991b1b" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="349" y="198.1" text-anchor="end" font-size="10" font-weight="bold" fill="#991b1b">T1_in = 444.05 °C</text>
+<text x="153" y="335" text-anchor="middle" font-size="11" font-weight="bold" fill="#111827">5079.5 gpm</text>
+<text x="153" y="350" text-anchor="middle" font-size="10" fill="#6b7280">(표 3.2.4.2.1 0초)</text>
+<text x="273" y="335" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e40af">5474.5 gpm (채택)</text>
+<text x="273" y="350" text-anchor="middle" font-size="10" fill="#1e40af">(초기조건 표 3.2.1.1)</text>
+<text x="585" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#1f2937">[2] ihx.py (N = 20) 정상상태 열교환량 [MW]</text>
+<rect x="445" y="80" width="280" height="235" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+<line x1="445" y1="315.0" x2="725" y2="315.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="319.0" text-anchor="end" font-size="10" fill="#374151">50</text>
+<line x1="445" y1="275.8" x2="725" y2="275.8" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="279.8" text-anchor="end" font-size="10" fill="#374151">52</text>
+<line x1="445" y1="236.7" x2="725" y2="236.7" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="240.7" text-anchor="end" font-size="10" fill="#374151">54</text>
+<line x1="445" y1="197.5" x2="725" y2="197.5" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="201.5" text-anchor="end" font-size="10" fill="#374151">56</text>
+<line x1="445" y1="158.3" x2="725" y2="158.3" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="162.3" text-anchor="end" font-size="10" fill="#374151">58</text>
+<line x1="445" y1="119.2" x2="725" y2="119.2" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="123.2" text-anchor="end" font-size="10" fill="#374151">60</text>
+<line x1="445" y1="80.0" x2="725" y2="80.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="437" y="84.0" text-anchor="end" font-size="10" fill="#374151">62</text>
+<rect x="485" y="226.3" width="76" height="88.7" fill="#f87171" rx="3"/>
+<text x="523" y="219.3" text-anchor="middle" font-size="11" font-weight="bold" fill="#b91c1c">54.53 MW</text>
+<text x="523" y="244.3" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">-5.47 MW 부족</text>
+<rect x="605" y="155.6" width="76" height="159.4" fill="#2563eb" rx="3"/>
+<text x="643" y="148.6" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e40af">58.14 MW</text>
+<text x="643" y="173.6" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">정격 부합</text>
+<line x1="445" y1="119.2" x2="725" y2="119.2" stroke="#111827" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="453" y="113.2" font-size="10" font-weight="bold" fill="#111827">목표 초기 출력 = 60.00 MW</text>
+<text x="523" y="335" text-anchor="middle" font-size="11" font-weight="bold" fill="#111827">5079.5 gpm</text>
+<text x="523" y="350" text-anchor="middle" font-size="10" fill="#6b7280">(280.97 kg/s)</text>
+<text x="643" y="335" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e40af">5474.5 gpm (채택)</text>
+<text x="643" y="350" text-anchor="middle" font-size="10" fill="#1e40af">(302.82 kg/s)</text>
+<text x="380" y="384" text-anchor="middle" font-size="11" fill="#374151">결론: 5079.5 gpm은 60 MW 제거가 물리적으로 불가능하므로 초기조건 표의 5474.5 gpm(302.82 kg/s)을 채택한다.</text>
+</svg>

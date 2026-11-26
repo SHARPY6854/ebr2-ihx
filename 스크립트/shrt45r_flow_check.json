@@ -1,0 +1,24 @@
+{
+  "5079.5": {
+    "mdot2_kg_s": 280.968,
+    "T2_req_for_60MW_C": 456.01,
+    "pinch_T1in_minus_T2req_K": -11.96,
+    "second_law_valid": false,
+    "Q_max_theoretical_MW": 55.76,
+    "ihx_Q_MW": 54.53,
+    "ihx_T1_out_C": 352.28,
+    "ihx_T2_out_C": 440.61,
+    "required_T1_in_for_60MW_C": 459.76
+  },
+  "5474.5": {
+    "mdot2_kg_s": 302.817,
+    "T2_req_for_60MW_C": 443.8,
+    "pinch_T1in_minus_T2req_K": 0.25,
+    "second_law_valid": true,
+    "Q_max_theoretical_MW": 60.1,
+    "ihx_Q_MW": 58.14,
+    "ihx_T1_out_C": 346.26,
+    "ihx_T2_out_C": 438.92,
+    "required_T1_in_for_60MW_C": 449.07
+  }
+}

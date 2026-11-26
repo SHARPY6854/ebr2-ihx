@@ -198,13 +198,19 @@ def interp_linear(t: float, times: List[float], values: List[float]) -> float:
     return values[lo] + w * (values[hi] - values[lo])
 
 
+# SHRT-45R 2차측 초기 유량 보정 비율 (초기조건 표 5474.5 gpm / 과도 유량표 0초 5079.5 gpm)
+SHRT45R_FLOW_SCALE: float = 5474.5 / 5079.5
+
+
 def load_secondary_bc(
     test_name: str = "SHRT17",
     bc_dir: str = DEFAULT_BC_DIR,
+    flow_scale: float = 1.0,
 ) -> Callable[[float], Tuple[float, float]]:
     """사양서 변환 CSV에서 2차측 입구 경계조건 보간 함수 bc_func(t_s) -> (T2_in_K, mdot2_kg_s) 생성.
 
-    test_name: 'SHRT17' 또는 'SHRT45R'
+    test_name : 'SHRT17' 또는 'SHRT45R'
+    flow_scale: 2차측 질량유량 배율 (기본값 1.0, SHRT-45R 초기유량 정합 시 SHRT45R_FLOW_SCALE 사용)
     """
     tag = test_name.upper().replace("-", "")
     flow_path = os.path.join(bc_dir, f"bc_ihx_secondary_flow_{tag}.csv")
@@ -215,7 +221,7 @@ def load_secondary_bc(
         reader = csv.DictReader(f)
         for row in reader:
             t_flow.append(float(row["time_s"]))
-            mdot_flow.append(float(row["mdot_kg_s"]))
+            mdot_flow.append(float(row["mdot_kg_s"]) * float(flow_scale))
 
     t_temp, T_temp = [], []
     with open(temp_path, encoding="utf-8") as f:
