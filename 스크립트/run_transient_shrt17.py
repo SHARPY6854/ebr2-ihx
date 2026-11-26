@@ -1,4 +1,8 @@
-"""4단계: SHRT-17 IHX 단독 과도 계산 스크립트 (0 ~ 900 s).
+"""4단계: SHRT-17 IHX 모듈 과도 동작 시험 스크립트 (0 ~ 900 s).
+
+주의: 기본 실행의 두 케이스는 1차측 입구 온도를 초기값으로 고정한 "모듈 동작 시험"이다.
+SHRT-17은 스크램 시험이라 실제 IHX 1차 입구 온도는 시간에 따라 떨어지므로, 기본 결과를
+SHRT-17 예측값으로 쓰면 안 된다. 실측 검증은 --primary-csv 로 실측 IHX 1차 입구 온도와 유량을 넣어 수행한다.
 
 기능:
 - 2차측 입구 유량과 온도는 사양서 변환 CSV (표 3.1.4.2.1~2, p.21)를 선형 보간해 입력
@@ -86,7 +90,7 @@ def run_single_case(
     t_end: float = 900.0,
 ) -> Tuple[List[Dict[str, float]], float]:
     """0 ~ t_end 초까지 IHX 과도 적분 실행 후 1초 간격 기록 반환."""
-    model = ihx.create_ihx(n_nodes=20, shell_corr="mikityuk", tube_corr="seban")
+    model = ihx.create_ihx(shell_corr="mikityuk", tube_corr="seban")
     T1_0, m1_0 = prim_bc(0.0)
     T2_0, m2_0 = sec_bc(0.0)
     r0 = ihx.solve_ihx_steady(model, T1_0, m1_0, T2_0, m2_0)
@@ -160,8 +164,8 @@ def write_svg_plots(hist_const: List[Dict[str, float]], hist_coast: List[Dict[st
     out = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="sans-serif">',
         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-        '<text x="435" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#111827">SHRT-17 IHX 단독 과도 해석 결과 (0 ~ 900 s)</text>',
-        '<text x="435" y="47" text-anchor="middle" font-size="11" fill="#4b5563">실선: 케이스 B (1차 유량 펌프감속+자연순환 반영) | 점선: 케이스 A (1차 유량 초기값 고정) | 2차측: 사양서 CSV</text>',
+        '<text x="435" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#111827">IHX 모듈 과도 동작 시험 (SHRT-17 2차측 경계조건, 1차 입구 온도 고정, 0 ~ 900 s)</text>',
+        '<text x="435" y="47" text-anchor="middle" font-size="11" fill="#4b5563">실선: 케이스 B (1차 유량 펌프 속도 비례 감소, 하한 4.5% 가정) | 점선: 케이스 A (1차 유량 고정) | 1차 입구 온도는 두 케이스 모두 고정</text>',
     ]
 
     panels = [
@@ -187,8 +191,8 @@ def write_svg_plots(hist_const: List[Dict[str, float]], hist_coast: List[Dict[st
     out.append(f'<polyline fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" points="{poly(hist_const, "mdot1_kg_s", vmin, vmax, py0, py1)}"/>')
     out.append(f'<polyline fill="none" stroke="#dc2626" stroke-width="2.4" points="{poly(hist_coast, "mdot1_kg_s", vmin, vmax, py0, py1)}"/>')
     out.append(f'<polyline fill="none" stroke="#2563eb" stroke-width="2.4" points="{poly(hist_coast, "mdot2_kg_s", vmin, vmax, py0, py1)}"/>')
-    out.append(f'<text x="535" y="{py0+20:.1f}" font-size="10" font-weight="bold" fill="#dc2626">빨간 실선: 1차 유량(감속) / 점선: 1차 유량(고정 452 kg/s)</text>')
-    out.append(f'<text x="535" y="{py0+36:.1f}" font-size="10" font-weight="bold" fill="#2563eb">파란 실선: 2차 유량 (사양서 CSV, 310.8 → 17.2 kg/s)</text>')
+    out.append(f'<text x="535" y="{py0+40:.1f}" font-size="10" font-weight="bold" fill="#dc2626">빨간 실선: 1차 유량(감속) / 점선: 1차 유량(고정 {hist_const[0]["mdot1_kg_s"]:.0f} kg/s)</text>')
+    out.append(f'<text x="535" y="{py0+56:.1f}" font-size="10" font-weight="bold" fill="#2563eb">파란 실선: 2차 유량 (사양서 CSV, 310.8 → 17.2 kg/s)</text>')
 
     # Panel 2 curves: Q_MW
     _, py0, py1, vmin, vmax, _ = panels[1]
@@ -205,7 +209,7 @@ def write_svg_plots(hist_const: List[Dict[str, float]], hist_coast: List[Dict[st
     out.append(f'<polyline fill="none" stroke="#2563eb" stroke-width="1.8" stroke-dasharray="6,4" points="{poly(hist_const, "T2_out_C", vmin, vmax, py0, py1)}"/>')
     out.append(f'<polyline fill="none" stroke="#2563eb" stroke-width="2.4" points="{poly(hist_coast, "T2_out_C", vmin, vmax, py0, py1)}"/>')
     out.append(f'<text x="445" y="{py0+42:.1f}" font-size="10" font-weight="bold" fill="#2563eb">파란선: 2차 출구 T2_out (실선 케이스 B, 점선 케이스 A)</text>')
-    out.append(f'<text x="445" y="{py0+58:.1f}" font-size="10" font-weight="bold" fill="#dc2626">빨간선: 1차 출구 T1_out (실선 케이스 B: 냉각 유지 / 점선 케이스 A: 미냉각 상승)</text>')
+    out.append(f'<text x="445" y="{py0+58:.1f}" font-size="10" font-weight="bold" fill="#dc2626">빨간선: 1차 출구 T1_out (실선 케이스 B, 점선 케이스 A)</text>')
     out.append(f'<text x="445" y="{py0+74:.1f}" font-size="10" fill="#4b5563">회색 점선: 2차 입구 T2_in (CSV 경계조건, 301.1 → 292.1 °C)</text>')
 
     out.append(f'<text x="{0.5*(x0+x1):.1f}" y="{H-12}" text-anchor="middle" font-size="12" font-weight="bold" fill="#111827">시간 [s]</text>')
@@ -222,7 +226,8 @@ def main() -> None:
 
     rho_800f = ihx.rho_na(f_to_k(800.0))
     mdot_core0 = 8500.0 * GPM_TO_M3S * rho_800f
-    mdot1_init = mdot_core0 * (8703.2 / 8766.6)  # 452.07 kg/s
+    # 표 5.3.1.1 (p.129): IHX 번들 유량 = IHX 출구 8421.0 gpm (입구 누설 17.5 gpm 제외, 번들 우회로 가정)
+    mdot1_init = 8421.0 * GPM_TO_M3S * rho_800f  # 451.13 kg/s
     T_core_in_K = f_to_k(664.8)
 
     T1_init_K = T_core_in_K + 57.29e6 / (mdot_core0 * ihx.cp_na(T_core_in_K + 50.0))

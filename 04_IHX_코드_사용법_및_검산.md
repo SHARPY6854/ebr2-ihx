@@ -21,8 +21,9 @@ Z-pipe, 저온풀, 루프 운동량 파트 코드를 합칠 때 아래 3개 함�
 ```python
 from ihx import create_ihx, load_secondary_bc, solve_ihx_steady, step_ihx
 
-# 1) IHX 생성 (기본 20노드) 및 2차측 CSV 경계조건 불러오기
-ihx = create_ihx(n_nodes=20)
+# 1) IHX 생성 (기본 N=80, 유효 전열길이 active) 및 2차측 CSV 경계조건 불러오기
+#    튜브 전체 길이로 비교하려면 create_ihx(length_mode="full")
+ihx = create_ihx()
 bc_sec = load_secondary_bc("SHRT17")  # 시각 t(초)를 넣으면 (T2_in_K, mdot2_kg_s) 반환
 
 # 2) 0초 정상상태 초기화
@@ -72,10 +73,11 @@ print("열교환량 [MW]:", res["Q_W"] / 1e6)
 
 | 검산 항목 | 확인 내용 | 결과 수치 | 판정 |
 |---|---|---|---|
-| **기하 치수** | `ihx_geometry.json` 로드 및 면적, 수력직경, $L/A$ 확인 | $A_1=0.63536\text{ m}^2$, $A_2=0.42674\text{ m}^2$, $L/A=4.9373\text{ m}^{-1}$ | 통과 |
+| **기하 치수** | `ihx_geometry.json` 로드 및 면적, 수력직경, $L/A$ 확인 | $A_1=0.63536\text{ m}^2$, $A_2=0.42674\text{ m}^2$, $L/A=4.0402\text{ m}^{-1}$ (active, $N=80$) | 통과 |
 | **기준 밀도 대조** | `calc_results.json`의 $800^\circ\text{F}$, $582^\circ\text{F}$ 나트륨 밀도와 비교 | $849.13\text{ kg/m}^3$, $876.75\text{ kg/m}^3$ (오차 $10^{-12}$ 미만) | 통과 |
 | **물성 단위 확인** | $400^\circ\text{C}$($673.15\text{ K}$) 나트륨 및 304SS 물성치 범위 점검 | $c_{p,\text{Na}}=1273.08\text{ J/(kg K)}$, $k_{\text{Na}}=72.86\text{ W/(m K)}$, $k_{304}=19.01\text{ W/(m K)}$ | 통과 |
-| **원통 벽 열저항** | 반벽 분할 저항 합($G_{1w}^{-1} + G_{w2}^{-1}$)과 원통 벽 이론 엄밀해 비교 | 상대 오차 $1.58 \times 10^{-16}$ | 통과 |
-| **등온 영점 테스트** | 양쪽 입구를 똑같이 $650\text{ K}$로 넣었을 때 온도 변화와 열교환량이 0인지 확인 | 최대 온도 편차 $4.21 \times 10^{-12}\text{ K}$, 열량 $1.95 \times 10^{-7}\text{ W}$ | 통과 |
-| **과도 에너지 보존** | 과도 1스텝($\Delta t = 0.1\text{ s}$)에서 `[저장 에너지 증가율 - 순 유입 열량]` 오차 | 잔차 $-9.02 \times 10^{-7}\text{ W}$ (57 MW 대비 사실상 0) | 통과 |
+| **원통 벽 열저항** | 반벽 분할 저항 합($G_{1w}^{-1} + G_{w2}^{-1}$)과 원통 벽 이론 엄밀해 비교 | 상대 오차 $3.87 \times 10^{-16}$ | 통과 |
+| **등온 영점 테스트** | 양쪽 입구를 똑같이 $650\text{ K}$로 넣었을 때 온도 변화와 열교환량이 0인지 확인 | 최대 온도 편차 $5.68 \times 10^{-12}\text{ K}$, 열량 $6.21 \times 10^{-7}\text{ W}$ | 통과 |
+| **과도 에너지 보존** | 과도 1스텝($\Delta t = 0.1\text{ s}$)에서 `[저장 에너지 증가율 - 순 유입 열량]` 오차 | 잔차 $-1.49 \times 10^{-7}\text{ W}$ (57 MW 대비 사실상 0) | 통과 |
+| **$\varepsilon$-NTU 해석해 대조** | $N=400$ 정상상태 열량과 같은 UA로 계산한 대향류 $\varepsilon$-NTU 열량 비교 (`effectiveness_ntu_check`) | 57.475 MW vs 57.470 MW, 상대차 $1.0 \times 10^{-4}$ (NTU 7.71) | 통과 |
 | **CSV 보간 확인** | SHRT-17 2차측 CSV $0\text{ s}$, $900\text{ s}$ 로드 및 단위 변환 확인 | $0\text{ s}$: $301.12^\circ\text{C}$, $310.84\text{ kg/s}$ / $900\text{ s}$: $292.13^\circ\text{C}$, $17.20\text{ kg/s}$ | 통과 |
