@@ -23,6 +23,17 @@ DEFAULT_GEOM_PATH = os.path.join(BASE_DIR, "스크립트", "ihx_geometry.json")
 DEFAULT_BC_DIR = os.path.join(BASE_DIR, "경계조건_CSV")
 GRAVITY = 9.80665  # 표준 중력가속도 [m/s^2]
 
+# 격자 기본값. 1차 상류 차분은 NTU(약 9)가 큰 이 IHX에서 수치 확산이 커서
+# N=20은 수렴값보다 열량을 약 2.6~2.9% 작게 준다. N=80이면 수렴값과 약 0.7% 이내.
+DEFAULT_N_NODES: int = 80
+
+# 1차측 실제 유동 구간 (ANL-ARC-226 Rev.1 5.2.7절 p.124 본문, 그림 5.2.7.3 p.127)
+# - 1차측 입구관(Z-pipe 출구)은 노심 하단 기준 4.939 m 높이로 들어온다 (본문 명시).
+#   그 위(약 5.369 m 상부 튜브시트까지)는 튜브시트로 막혀 1차측 하향 유동이 없다.
+# - 1차측 출구는 하부 튜브시트 바로 위 환형 개구부 (그림 판독값 약 2.372 m, 확인 필요).
+PRIMARY_INLET_ELEV_M: float = 4.939
+PRIMARY_OUTLET_ELEV_M: float = 2.372
+
 
 # =============================================================================
 # 1. 물성치 함수 (입력 온도 T 단위: K, 반환값: 모두 SI 단위)
@@ -252,14 +263,20 @@ class IHXModel:
 
     def __init__(
         self,
-        n_nodes: int = 20,
+        n_nodes: int = DEFAULT_N_NODES,
         geom_path: str = DEFAULT_GEOM_PATH,
         shell_corr: str = "mikityuk",
         tube_corr: str = "seban",
         use_secondary_plena: bool = False,
         k_form_shell: float = 0.0,
         T_init_K: float = 625.0,
+        length_mode: str = "active",
     ) -> None:
+        """length_mode:
+        - 'active' (기본): 1차측이 실제로 튜브를 따라 흐르는 구간만 열전달 길이로 사용
+          (1차 입구 4.939 m ~ 1차 출구 약 2.372 m, 길이 2.567 m)
+        - 'full'         : 튜브 전체 길이 3.137 m 사용 (민감도 비교용)
+        """
         with open(geom_path, encoding="utf-8") as f:
             raw = json.load(f)
         g = raw["given"]
@@ -278,7 +295,17 @@ class IHXModel:
         self.wall_thk: float = float(g["tube_wall_m"])
         self.pitch: float = float(g["pitch_m"])
         self.P_over_D: float = float(d["P_over_D"])
-        self.L: float = float(g["tube_length_m"])
+        self.length_mode = length_mode.lower()
+        if self.length_mode == "active":
+            self.z_top: float = PRIMARY_INLET_ELEV_M
+            self.z_bot: float = PRIMARY_OUTLET_ELEV_M
+        elif self.length_mode == "full":
+            self.z_top = float(g["fig_upper_tubesheet_elev_m"])
+            self.z_bot = float(g["fig_lower_tubesheet_bottom_elev_m"])
+        else:
+            raise ValueError(f"지원하지 않는 length_mode: {length_mode}")
+        self.L_tube: float = float(g["tube_length_m"])
+        self.L: float = self.z_top - self.z_bot
         self.dz: float = self.L / self.N
 
         self.A1: float = float(d["shell_flow_area_m2_assume_center_pipe"])
@@ -288,8 +315,8 @@ class IHXModel:
         self.Dh2: float = float(d["tube_Dh_m"])
 
         # 단일 노드 전열면적 및 체적
-        self.Ao_node: float = float(d["HT_area_outer_m2"]) / self.N
-        self.Ai_node: float = float(d["HT_area_inner_m2"]) / self.N
+        self.Ao_node: float = self.N_tubes * math.pi * self.Do * self.dz
+        self.Ai_node: float = self.N_tubes * math.pi * self.Di * self.dz
         self.V1_node: float = self.A1 * self.dz
         self.V2_node: float = self.A2 * self.dz
         self.Vw_node: float = self.Aw * self.dz
@@ -302,9 +329,7 @@ class IHXModel:
         self._rw_outer_geom: float = math.log(self.ro / self.rm) / (2.0 * math.pi * self.dz * self.N_tubes)
         self._rw_inner_geom: float = math.log(self.rm / self.ri) / (2.0 * math.pi * self.dz * self.N_tubes)
 
-        # 높이 정보 (노심 유효하단 z = 0 기준 [m], 루프 부력 계산용)
-        self.z_top: float = float(g["fig_upper_tubesheet_elev_m"])
-        self.z_bot: float = float(g["fig_lower_tubesheet_bottom_elev_m"])
+        # 높이 정보 (노심 유효하단 z = 0 기준 [m], 루프 부력 계산용). z_top, z_bot은 위에서 설정
         self.z_nodes: List[float] = [
             self.z_top - (j + 0.5) * self.dz for j in range(self.N)
         ]
@@ -679,12 +704,13 @@ class IHXModel:
 # =============================================================================
 
 def create_ihx(
-    n_nodes: int = 20,
+    n_nodes: int = DEFAULT_N_NODES,
     geom_path: str = DEFAULT_GEOM_PATH,
     shell_corr: str = "mikityuk",
     tube_corr: str = "seban",
     use_secondary_plena: bool = False,
     k_form_shell: float = 0.0,
+    length_mode: str = "active",
 ) -> IHXModel:
     """IHX 모델 인스턴스 생성."""
     return IHXModel(
@@ -694,7 +720,32 @@ def create_ihx(
         tube_corr=tube_corr,
         use_secondary_plena=use_secondary_plena,
         k_form_shell=k_form_shell,
+        length_mode=length_mode,
     )
+
+
+def effectiveness_ntu_check(ihx: IHXModel, T1_in: float, mdot1: float, T2_in: float, mdot2: float) -> Dict[str, float]:
+    """현재 정상상태 해의 노드별 컨덕턴스로 UA를 구해 대향류 epsilon-NTU 해석해와 비교.
+
+    격자가 충분히 촘촘하면 수치해 Q와 해석해 Q_eNTU가 일치해야 한다 (구현 검증용).
+    """
+    UA = 0.0
+    for j in range(ihx.N):
+        G1w, Gw2, _, _ = ihx._node_conductances(ihx.T1[j], ihx.Tw[j], ihx.T2[j], mdot1, mdot2)
+        UA += 1.0 / (1.0 / G1w + 1.0 / Gw2)
+    T1_out = ihx.T1[-1]
+    T2_out = ihx.T2[0]
+    C1 = abs(mdot1) * cp_na(0.5 * (T1_in + T1_out))
+    C2 = abs(mdot2) * cp_na(0.5 * (T2_in + T2_out))
+    Cmin, Cmax = min(C1, C2), max(C1, C2)
+    Cr = Cmin / Cmax
+    NTU = UA / Cmin
+    if abs(1.0 - Cr) < 1.0e-9:
+        eps = NTU / (1.0 + NTU)
+    else:
+        e = math.exp(-NTU * (1.0 - Cr))
+        eps = (1.0 - e) / (1.0 - Cr * e)
+    return {"UA_W_K": UA, "NTU": NTU, "Cr": Cr, "eps": eps, "Q_eNTU_W": eps * Cmin * (T1_in - T2_in)}
 
 
 def solve_ihx_steady(
@@ -720,13 +771,13 @@ def _run_self_checks() -> None:
     print("EBR-II IHX 모듈 (ihx.py) 단위 일관성 및 물리 정합성 검산")
     print("=" * 68)
 
-    ihx = create_ihx(n_nodes=20)
-    print(f"[1] 기하 형상 로드 완료 (N = {ihx.N}, dz = {ihx.dz:.5f} m)")
+    ihx = create_ihx()
+    print(f"[1] 기하 형상 로드 완료 (N = {ihx.N}, length_mode = {ihx.length_mode}, L = {ihx.L:.3f} m, dz = {ihx.dz:.5f} m)")
     print(f"    1차측 유동면적 A1 = {ihx.A1:.5f} m^2, 수력직경 Dh1 = {ihx.Dh1*1e3:.3f} mm")
     print(f"    2차측 유동면적 A2 = {ihx.A2:.5f} m^2, 수력직경 Dh2 = {ihx.Dh2*1e3:.3f} mm")
     print(f"    전열면적 합계: 외측 = {ihx.Ao_node*ihx.N:.2f} m^2, 내측 = {ihx.Ai_node*ihx.N:.2f} m^2")
     print(f"    1차측 관성계수 L/A = {ihx.L_over_A:.4f} m^-1")
-    print(f"    노드 중심 높이 범위: z_1 = {ihx.z_nodes[0]:.3f} m ~ z_20 = {ihx.z_nodes[-1]:.3f} m")
+    print(f"    노드 중심 높이 범위: z_1 = {ihx.z_nodes[0]:.3f} m ~ z_{ihx.N} = {ihx.z_nodes[-1]:.3f} m")
 
     # 기준온도 밀도 검산 (팀 공통 calc_results.json 대조)
     T_800F = (800.0 - 32.0) * 5.0 / 9.0 + 273.15
@@ -777,11 +828,20 @@ def _run_self_checks() -> None:
     assert abs(res_step["energy_residual_W"]) < 1.0e-4
     print(f"[5] 과도 1스텝(dt=0.1 s) 이산 에너지 보존 잔차 = {res_step['energy_residual_W']:.3e} W (기계 정밀도 수준)")
 
+    # epsilon-NTU 해석해 대조 (촘촘한 격자에서 수치해가 해석해로 수렴하는지)
+    fine = create_ihx(n_nodes=400)
+    r_f = solve_ihx_steady(fine, T1_in_K=723.5, mdot1_kg_s=452.0, T2_in_K=574.2, mdot2_kg_s=310.6)
+    chk = effectiveness_ntu_check(fine, 723.5, 452.0, 574.2, 310.6)
+    rel_entu = abs(r_f["Q_W"] - chk["Q_eNTU_W"]) / chk["Q_eNTU_W"]
+    assert rel_entu < 2.0e-3, f"epsilon-NTU 해석해와 불일치: {rel_entu:.3e}"
+    print(f"[6] epsilon-NTU 해석해 대조 (N=400): Q = {r_f['Q_W']/1e6:.3f} MW, Q_eNTU = {chk['Q_eNTU_W']/1e6:.3f} MW, "
+          f"상대차 {rel_entu:.2e} (NTU = {chk['NTU']:.2f})")
+
     # 경계조건 CSV 보간기 검산
     bc17 = load_secondary_bc("SHRT17")
     T2_0, m2_0 = bc17(0.0)
     T2_900, m2_900 = bc17(900.0)
-    print(f"[6] SHRT-17 경계조건 CSV 보간 검산:")
+    print(f"[7] SHRT-17 경계조건 CSV 보간 검산:")
     print(f"    t =   0 s -> T2_in = {T2_0:.3f} K ({T2_0-273.15:.2f} C), mdot2 = {m2_0:.3f} kg/s")
     print(f"    t = 900 s -> T2_in = {T2_900:.3f} K ({T2_900-273.15:.2f} C), mdot2 = {m2_900:.3f} kg/s")
     print("=" * 68)
