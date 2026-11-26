@@ -1,0 +1,82 @@
+{
+  "direct_core_outlet_case": {
+    "T1_in_C": 450.394,
+    "mdot1_kg_s": 452.067,
+    "T2_in_C": 301.0,
+    "mdot2_kg_s": 310.566,
+    "Q_MW": 56.8586,
+    "T1_out_C": 351.673,
+    "T2_out_C": 444.221,
+    "dT2_K": 143.221,
+    "energy_residual_W": 7.003545761108398e-07
+  },
+  "exact_57p29MW_match_case": {
+    "required_T1_in_C": 451.536,
+    "T1_out_C": 352.057,
+    "T2_out_C": 445.319,
+    "dT2_K": 144.319,
+    "energy_residual_W": 7.078051567077637e-07
+  },
+  "sensitivity": [
+    {
+      "N": 10,
+      "shell_corr": "mikityuk",
+      "tube_corr": "seban",
+      "Q_MW": 55.157,
+      "T1_out_C": 354.64,
+      "T2_out_C": 439.981,
+      "dT2_K": 138.981,
+      "energy_err_W": 4.172325134277344e-07
+    },
+    {
+      "N": 20,
+      "shell_corr": "mikityuk",
+      "tube_corr": "seban",
+      "Q_MW": 56.8586,
+      "T1_out_C": 351.673,
+      "T2_out_C": 444.221,
+      "dT2_K": 143.221,
+      "energy_err_W": 7.003545761108398e-07
+    },
+    {
+      "N": 40,
+      "shell_corr": "mikityuk",
+      "tube_corr": "seban",
+      "Q_MW": 57.6444,
+      "T1_out_C": 350.297,
+      "T2_out_C": 446.163,
+      "dT2_K": 145.163,
+      "energy_err_W": 1.5273690223693848e-06
+    },
+    {
+      "N": 20,
+      "shell_corr": "ushakov",
+      "tube_corr": "seban",
+      "Q_MW": 56.9259,
+      "T1_out_C": 351.557,
+      "T2_out_C": 444.393,
+      "dT2_K": 143.393,
+      "energy_err_W": 8.940696716308594e-07
+    },
+    {
+      "N": 20,
+      "shell_corr": "schad",
+      "tube_corr": "seban",
+      "Q_MW": 56.7952,
+      "T1_out_C": 351.782,
+      "T2_out_C": 444.058,
+      "dT2_K": 143.058,
+      "energy_err_W": 1.080334186553955e-06
+    },
+    {
+      "N": 20,
+      "shell_corr": "mikityuk",
+      "tube_corr": "lyon",
+      "Q_MW": 57.1032,
+      "T1_out_C": 351.253,
+      "T2_out_C": 444.846,
+      "dT2_K": 143.846,
+      "energy_err_W": 3.0547380447387695e-07
+    }
+  ]
+}
